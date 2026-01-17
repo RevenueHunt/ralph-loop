@@ -54,6 +54,38 @@ After implementing, verify your work:
 2. **Type check**: See AGENTS.md for typecheck command
 3. **Lint**: See AGENTS.md for lint command
 4. **Manual check**: Review code against acceptance criteria
+5. **Browser verification** (for web projects): Use `agent-browser` for token-efficient visual verification
+
+### Browser Testing with agent-browser
+
+For web/frontend tasks, use [agent-browser](https://github.com/vercel-labs/agent-browser) to verify UI changes. It's optimized for AI agents with minimal token usage.
+
+```bash
+# Open the local dev server
+agent-browser open http://localhost:3000
+
+# Get accessibility snapshot (token-efficient way to "see" the page)
+agent-browser snapshot --interactive
+
+# Interact using element refs from snapshot
+agent-browser click @e2
+agent-browser fill @e3 "test@example.com"
+
+# Get text content to verify
+agent-browser get text @e1
+
+# Take screenshot for visual verification
+agent-browser screenshot verification.png
+
+# Close when done
+agent-browser close
+```
+
+Use this workflow to verify:
+- UI components render correctly
+- Forms submit and validate properly
+- Navigation works as expected
+- Error states display appropriately
 
 ### Verification Checklist
 
