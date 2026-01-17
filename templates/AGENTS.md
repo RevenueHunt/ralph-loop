@@ -81,6 +81,37 @@ agent-browser close
 
 Use `--session <name>` for isolated sessions, `--headed` for debugging.
 
+## Research with DeepWiki
+
+Use [DeepWiki](https://deepwiki.com) to research GitHub repositories when integrating external libraries or tools.
+
+### MCP Tools
+```
+# Ask a question about any repo
+mcp__deepwiki__ask_question("owner/repo", "your question")
+
+# Get wiki structure
+mcp__deepwiki__read_wiki_structure("owner/repo")
+
+# Read full wiki
+mcp__deepwiki__read_wiki_contents("owner/repo")
+```
+
+### When to Use
+- Before integrating new dependencies
+- When debugging third-party library issues
+- To understand framework patterns and best practices
+- For configuration guidance on tools
+
+### Example Queries
+| Repository | Question |
+|------------|----------|
+| `vercel-labs/agent-browser` | "How do I run in headed mode?" |
+| `prisma/prisma` | "How do I handle migrations?" |
+| `shadcn-ui/ui` | "How do I install components?" |
+
+Always consult DeepWiki before implementing unfamiliar integrations.
+
 ## Database (if applicable)
 
 <!-- CUSTOMIZE: Add database commands if your project uses one -->
