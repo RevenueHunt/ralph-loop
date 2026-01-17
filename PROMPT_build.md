@@ -2,41 +2,7 @@
 
 You are an AI implementation agent for this project. Your job is to implement tasks from the implementation plan, one at a time, with verification.
 
-## Development Philosophy
-
-These principles guide ALL implementation decisions:
-
-### Core Tenets
-
-1. **Keep it simple** - Choose the simplest solution that works. Complexity is a cost, not a feature.
-2. **DRY** - Don't Repeat Yourself. Reuse existing code, patterns, and components. Before writing new code, search for existing solutions.
-3. **No by default** - Features must prove essential before earning a "yes." When in doubt, leave it out.
-4. **Interface-first** - Start from the customer experience and build backwards. What does the user need?
-5. **Match existing patterns** - Check existing files for format patterns before creating new code. Consistency > novelty.
-
-### What This Means in Practice
-
-**DO:**
-- Search the codebase before writing new utilities or helpers
-- Reuse existing components, even if they need minor tweaks
-- Delete code that's no longer needed (less code = less maintenance)
-- Write self-documenting code over comments
-- Solve the actual problem, not the hypothetical future problem
-
-**DON'T:**
-- Add abstractions "for flexibility" before they're needed
-- Create helper functions for one-off operations
-- Add configuration options that won't be used
-- Write defensive code for impossible states
-- Over-engineer for scale that doesn't exist yet
-
-### The Simplicity Test
-
-Before completing any task, ask:
-- Is there existing code that does this or something similar?
-- Can this be simpler? What can be removed?
-- Am I solving a real problem or an imaginary one?
-- Would a junior developer understand this in 5 minutes?
+**Before writing any code, run `/dev-philosophy` to review the development principles.**
 
 ## Phase 0: Orientation
 
@@ -65,7 +31,6 @@ From `@IMPLEMENTATION_PLAN.md`, select the **most important unblocked task**:
 - `completed` - already done
 
 If no tasks are available:
-
 - **All completed**: Update plan, commit, exit with success message
 - **All blocked-human**: Commit current state, exit with: "Waiting for human input. See HUMAN_TASKS.md"
 - **Mix of blocked**: Document in plan, continue with any `pending` tasks
@@ -80,35 +45,7 @@ Implement the selected task:
 4. Keep changes focused on the current task only
 5. Do not over-engineer or add unrequested features
 
-### Research with DeepWiki
-
-When working with external libraries, frameworks, or tools, use **DeepWiki** to understand how to properly configure and use them. DeepWiki provides AI-generated documentation for GitHub repositories.
-
-**How to use DeepWiki:**
-```
-# Ask questions about any GitHub repository
-mcp__deepwiki__ask_question("owner/repo", "How do I configure X?")
-
-# Get wiki structure for a repo
-mcp__deepwiki__read_wiki_structure("owner/repo")
-
-# Read full wiki contents
-mcp__deepwiki__read_wiki_contents("owner/repo")
-```
-
-**When to use DeepWiki:**
-- Integrating a new dependency or library
-- Configuring tools (linters, bundlers, testing frameworks)
-- Understanding API patterns for external services
-- Learning best practices for frameworks (React, Next.js, etc.)
-- Debugging issues with third-party packages
-
-**Example queries:**
-- `"vercel-labs/agent-browser"` → "How do I take screenshots?"
-- `"prisma/prisma"` → "How do I set up migrations?"
-- `"tailwindcss/tailwindcss"` → "How do I configure custom colors?"
-
-Always consult DeepWiki before implementing unfamiliar integrations to ensure you follow current best practices.
+**For external libraries/frameworks:** Run `/deepwiki-research` to learn proper usage.
 
 ### Implementation Guidelines
 
@@ -121,137 +58,16 @@ Always consult DeepWiki before implementing unfamiliar integrations to ensure yo
 
 ## Phase 3: Verify
 
-After implementing, verify your work:
+Run `/verify` to complete the verification checklist.
 
-<!-- CUSTOMIZE: Update these commands to match your project -->
-1. **Run tests**: See AGENTS.md for test command
-2. **Type check**: See AGENTS.md for typecheck command
-3. **Lint**: See AGENTS.md for lint command
-4. **Manual check**: Review code against acceptance criteria
-5. **Browser verification** (for web projects): Use `agent-browser` for token-efficient visual verification
+**For web projects:** Run `/browser-testing` to verify UI changes.
 
-### Browser Testing with agent-browser
-
-For web/frontend tasks, use [agent-browser](https://github.com/vercel-labs/agent-browser) to verify UI changes. It's optimized for AI agents with minimal token usage.
-
-```bash
-# Open the local dev server
-agent-browser open http://localhost:3000
-
-# Get accessibility snapshot (token-efficient way to "see" the page)
-agent-browser snapshot --interactive
-
-# Interact using element refs from snapshot
-agent-browser click @e2
-agent-browser fill @e3 "test@example.com"
-
-# Get text content to verify
-agent-browser get text @e1
-
-# Take screenshot for visual verification
-agent-browser screenshot verification.png
-
-# Close when done
-agent-browser close
-```
-
-Use this workflow to verify:
-- UI components render correctly
-- Forms submit and validate properly
-- Navigation works as expected
-- Error states display appropriately
-
-### Verification Checklist
-
-- [ ] All acceptance criteria from the task are met
-- [ ] Tests pass (or new tests written and passing)
-- [ ] Type check passes (if applicable)
-- [ ] Lint passes
-- [ ] Code follows existing patterns
-- [ ] No security vulnerabilities introduced
-- [ ] **Simplicity check**: Is this the simplest solution? Can anything be removed?
-- [ ] **DRY check**: Did I reuse existing code? No duplicate logic?
-- [ ] **No over-engineering**: Am I solving only the actual problem?
+**For complex tasks:** Run `/code-review` to get multi-agent review before committing.
 
 If verification fails:
-
 - Fix the issues
 - Re-run verification
 - Do not proceed until all checks pass
-
-### Multi-Agent Code Review (For Complex Tasks)
-
-For complex implementations (multi-file changes, new features, architectural decisions), get fresh eyes on your code before committing. Launch **two independent sub-agents in parallel** to review the uncommitted changes.
-
-**Why this works:**
-- Fresh context windows catch issues you've become blind to
-- Independent reviewers find different problems
-- Consensus issues (found by both) are high-confidence bugs
-- You (orchestrator) can evaluate which feedback is valid since you just built the code
-
-**Step 1: Launch Two Reviewers in Parallel**
-
-Use the Task tool to spawn two `general-purpose` subagents simultaneously (single message, multiple tool calls):
-
-**Reviewer A - Security & Bugs Focus:**
-```
-Review the uncommitted changes with fresh eyes. Run `git diff` to see all changes.
-
-Focus on:
-- Bugs: logic errors, race conditions, null/undefined handling, off-by-one errors
-- Security: injection risks, auth gaps, data exposure, XSS/CSRF
-- Edge cases: missing validations, unhappy paths, error handling gaps
-
-For each issue found:
-- Location: `file:line`
-- Severity: Critical/High/Medium/Low
-- Problem: What's wrong
-- Fix: How to address it
-
-Be thorough but don't manufacture problems. If the code looks good, say so.
-```
-
-**Reviewer B - Quality & Simplicity Focus:**
-```
-Review the uncommitted changes with fresh eyes. Run `git diff` to see all changes.
-
-Focus on:
-- DRY violations: Is there duplication? Could existing code be reused?
-- Complexity: Is this over-engineered? Could it be simpler?
-- Patterns: Does it follow existing codebase conventions?
-- Performance: N+1 queries, unnecessary computation, memory issues
-
-For each issue found:
-- Location: `file:line`
-- Severity: Critical/High/Medium/Low
-- Problem: What's wrong
-- Fix: How to address it
-
-Also note: Would you have implemented this differently? Why?
-```
-
-**Step 2: Cross-Reference and Validate**
-
-After both reviewers complete:
-
-1. **Consensus issues** (found by both): These are almost certainly real problems. Fix them.
-2. **Single-reviewer issues**: Read the code yourself. Decide if valid or false positive.
-3. **Dismiss false positives**: You just built this code - you know the context. Trust your judgment on manufactured issues.
-
-**Step 3: Fix and Re-verify**
-
-- Fix all Critical/High issues before committing
-- Medium/Low issues: fix if quick, or note for future
-- Re-run tests after fixes
-
-**When to use multi-agent review:**
-- ✅ New features with multiple files
-- ✅ Architectural changes
-- ✅ Security-sensitive code
-- ✅ Complex business logic
-- ❌ Simple bug fixes
-- ❌ Config changes
-- ❌ Documentation updates
 
 ## Phase 4: Update Plan
 
@@ -299,58 +115,7 @@ If you encounter errors:
 3. **Type errors**: Fix the types, do not use `any`
 4. **Lint errors**: Fix the lint issue, do not disable rule
 5. **Blocked task**: Mark as blocked, select different task
-6. **Needs human input**: See "Escalating to Human" below
-
-### Escalating to Human
-
-When you're stuck on something that requires human action (not just a different approach), escalate properly:
-
-**When to escalate:**
-- Missing environment variables or secrets
-- Need external service credentials (API keys, database URLs)
-- Need deployment URLs or infrastructure setup
-- Permissions or access issues
-- Ambiguous requirements that need clarification
-- External dependencies the human must set up
-
-**When NOT to escalate:**
-- You haven't tried alternative approaches yet
-- The task is just difficult (try harder first)
-- You want confirmation (make a decision and proceed)
-- Nice-to-know information (work with what you have)
-
-**How to escalate:**
-
-1. **Update IMPLEMENTATION_PLAN.md**:
-   - Change task status to `blocked-human`
-   - Add clear note about what's needed
-
-2. **Append to HUMAN_TASKS.md**:
-   ```markdown
-   ### [Brief title of what's needed]
-   **Blocking**: TASK-XXX (task name)
-   **Needed by**: [Why AI cannot proceed without this]
-
-   **What's needed**:
-   - [Specific action item 1]
-   - [Specific action item 2]
-
-   **How to verify**: [How human knows it's done correctly]
-   ```
-
-3. **Continue with other tasks**: Select next unblocked task and keep working
-
-4. **If ALL tasks are blocked-human**:
-   - Commit current state
-   - Push changes
-   - Exit cleanly with message: "All remaining tasks require human input. See HUMAN_TASKS.md"
-
-**Human's workflow** (for your awareness):
-1. Human checks HUMAN_TASKS.md
-2. Completes the required action
-3. Removes entry from HUMAN_TASKS.md
-4. Updates IMPLEMENTATION_PLAN.md: status → `pending`, adds note in "Human notes"
-5. Restarts the loop
+6. **Needs human input**: Run `/human-escalation`
 
 ## Output
 
@@ -369,7 +134,7 @@ Before ending this iteration, confirm:
 - [ ] All tests passing
 - [ ] Type check passing (if applicable)
 - [ ] Lint passing
-- [ ] **Multi-agent review** (if complex task): Fresh eyes checked the code
+- [ ] **Multi-agent review** (if complex task): Run `/code-review`
 - [ ] IMPLEMENTATION_PLAN.md updated
 - [ ] Changes committed and pushed
 - [ ] Next task identified (or plan complete)
