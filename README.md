@@ -1,177 +1,155 @@
 # RALPH Playbook
 
-Autonomous AI Development Loop based on the [Ralph Playbook](https://github.com/ClaytonFarr/ralph-playbook) methodology.
+Autonomous AI development loop based on the [Ralph Playbook](https://github.com/ClaytonFarr/ralph-playbook) methodology by Clayton Farr.
 
-RALPH (Recursive Autonomous Loop for Programming Hyperproductivity) uses Claude to autonomously implement features through a continuous bash loop with file-based state management.
+Claude autonomously implements features through a continuous bash loop with file-based state management, human escalation workflows, and multi-agent code review.
 
 ## How It Works
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                       RALPH LOOP                             │
+│                       RALPH LOOP                            │
 ├─────────────────────────────────────────────────────────────┤
-│                                                              │
-│  ┌──────────┐    ┌──────────┐    ┌──────────┐              │
-│  │   PLAN   │───►│  BUILD   │───►│  VERIFY  │──┐           │
-│  │   MODE   │    │   MODE   │    │          │  │           │
-│  └──────────┘    └──────────┘    └──────────┘  │           │
-│       ▲                                         │           │
-│       │              ┌──────────┐              │           │
-│       └──────────────│   GIT    │◄─────────────┘           │
-│                      │  COMMIT  │                          │
-│                      └──────────┘                          │
-│                                                              │
+│                                                             │
+│  ┌──────────┐    ┌──────────┐    ┌──────────┐             │
+│  │   PLAN   │───►│  BUILD   │───►│  VERIFY  │──┐          │
+│  │          │    │          │    │          │  │          │
+│  └──────────┘    └──────────┘    └──────────┘  │          │
+│       ▲                               │        │          │
+│       │         ┌──────────┐          │        │          │
+│       │         │  HUMAN   │◄─────────┘        │          │
+│       │         │  TASKS   │ (if blocked)      │          │
+│       │         └──────────┘                   │          │
+│       │              ┌──────────┐              │          │
+│       └──────────────│   GIT    │◄─────────────┘          │
+│                      │  COMMIT  │                         │
+│                      └──────────┘                         │
+│                                                             │
 └─────────────────────────────────────────────────────────────┘
 ```
 
+## Features
+
+- **Autonomous implementation** - Claude picks tasks, implements, verifies, and commits
+- **Human escalation** - Tasks requiring human input are tracked in HUMAN_TASKS.md
+- **Multi-agent code review** - Complex tasks get parallel review from specialized agents
+- **Browser testing** - Web UI verification via agent-browser
+- **External library research** - DeepWiki integration for learning APIs
+- **Package management** - Perplexity search for latest versions and compatibility
+- **Skills system** - Slash commands provide fresh context at each stage
+
 ## Quick Start
 
-### 1. Copy Files to Your Project
+### 1. Copy to Your Project
 
 ```bash
-# Copy the core files
+# Copy core files
 cp ralph_playbook/loop.sh your-project/
-cp ralph_playbook/PROMPT_build.md your-project/
-cp ralph_playbook/PROMPT_plan.md your-project/
+cp ralph_playbook/PROMPT_*.md your-project/
 
-# Copy templates and customize
-cp ralph_playbook/templates/PRD.md your-project/
-cp ralph_playbook/templates/AGENTS.md your-project/
-cp ralph_playbook/templates/IMPLEMENTATION_PLAN.md your-project/
-
-# Create specs directory
+# Copy templates
+cp ralph_playbook/templates/*.md your-project/
 mkdir -p your-project/specs
-cp ralph_playbook/templates/specs/01-example-spec.md your-project/specs/
+cp ralph_playbook/templates/specs/*.md your-project/specs/
+
+# Copy Claude Code skills
+cp -r ralph_playbook/.claude your-project/
 ```
 
-### 2. Customize for Your Project
+### 2. Customize
 
-1. **Edit `PRD.md`**: Define your product requirements and task list
-2. **Edit `AGENTS.md`**: Add your project's build, test, and lint commands
-3. **Create `specs/*.md`**: Write detailed specifications for each feature/component
-4. **Edit `PROMPT_build.md`**: Customize the implementation guidelines section
-5. **Initialize git**: Ensure your project is a git repository
+1. **PRD.md** - Define your product requirements
+2. **AGENTS.md** - Add your build, test, lint commands
+3. **specs/*.md** - Write detailed specifications
+4. **PROMPT_build.md** - Customize implementation guidelines (optional)
 
-### 3. Run the Loop
+### 3. Run
 
 ```bash
-# Planning mode - creates/updates IMPLEMENTATION_PLAN.md
+# Planning mode - creates IMPLEMENTATION_PLAN.md
 ./loop.sh plan
 
-# Build mode - implements tasks from the plan
+# Build mode - implements tasks autonomously
 ./loop.sh build
 
-# Build mode with custom iteration limit
+# Build with iteration limit
 ./loop.sh build 10
 ```
 
-## File Reference
+## Skills (Slash Commands)
 
-### Core Files
+The build prompt references these skills for fresh context at each stage:
+
+| Skill | When Used | Purpose |
+|-------|-----------|---------|
+| `/dev-philosophy` | Before coding | Development principles: simplicity, DRY, no over-engineering |
+| `/deepwiki-research` | New dependencies | Research external libraries via DeepWiki MCP |
+| `/verify` | After implementation | Verification checklist: tests, types, lint |
+| `/browser-testing` | Web projects | UI verification via agent-browser |
+| `/code-review` | Complex tasks | Multi-agent parallel code review |
+| `/human-escalation` | When blocked | Escalation workflow for human input |
+
+Skills are stored in `.claude/commands/` and loaded on-demand to reduce token usage.
+
+## File Reference
 
 | File | Purpose |
 |------|---------|
-| `loop.sh` | Bash script that orchestrates the RALPH iterations |
-| `PROMPT_plan.md` | Instructions for Claude in planning mode |
-| `PROMPT_build.md` | Instructions for Claude in build mode |
-| `AGENTS.md` | Operational knowledge (commands, patterns) |
+| `loop.sh` | Orchestrates RALPH iterations |
+| `PROMPT_plan.md` | Planning mode instructions |
+| `PROMPT_build.md` | Build mode instructions (references skills) |
+| `AGENTS.md` | Operational knowledge: commands, patterns, learnings |
 | `IMPLEMENTATION_PLAN.md` | Task tracking with status and dependencies |
-| `PRD.md` | Product requirements document |
-| `specs/*.md` | Detailed specifications (source of truth) |
+| `HUMAN_TASKS.md` | Tasks requiring human action |
+| `PRD.md` | Product requirements |
+| `specs/*.md` | Detailed specifications |
+| `.claude/commands/*.md` | Claude Code skills |
 
-### Modes
+## Modes
 
 **Plan Mode** (`./loop.sh plan`):
 - Analyzes specs vs current code
 - Creates/updates IMPLEMENTATION_PLAN.md
 - Does NOT modify source code
-- Does NOT run builds or tests
 
 **Build Mode** (`./loop.sh build`):
 - Picks highest priority unblocked task
-- Implements the task
-- Runs verification (tests, lint, typecheck)
-- Updates IMPLEMENTATION_PLAN.md
-- Commits and pushes changes
+- Implements with verification
+- Commits and pushes on success
+- Escalates to HUMAN_TASKS.md when blocked
 
-## Customization Guide
+## Human Escalation
 
-### AGENTS.md
+When Claude encounters tasks requiring human input:
 
-Add your project-specific commands:
+1. Task is marked `blocked-human` in IMPLEMENTATION_PLAN.md
+2. Details added to HUMAN_TASKS.md
+3. Loop continues with other tasks or exits
 
-```markdown
-## Build & Run
-
-```bash
-# Your install command
-npm install
-
-# Your dev command
-npm run dev
-```
-
-## Validation
-
-```bash
-# Your test command
-npm run test
-
-# Your lint command
-npm run lint
-```
-```
-
-### PROMPT_build.md
-
-Customize the "Implementation Guidelines" section:
-
-```markdown
-### Implementation Guidelines
-
-- **File structure**: [Your project structure]
-- **Validation**: [Your validation library]
-- **Auth**: [Your auth patterns]
-- **Types**: [Your type system]
-```
-
-### specs/*.md
-
-Create one spec file per feature/component:
-
-```
-specs/
-├── 01-auth.md
-├── 02-api.md
-├── 03-ui.md
-└── 04-database.md
-```
+To unblock:
+1. Complete the action in HUMAN_TASKS.md
+2. Add notes to the "Human notes" field
+3. Change status from `blocked-human` to `pending`
+4. Next loop iteration will pick up the task
 
 ## Prerequisites
 
-- [Claude Code CLI](https://github.com/anthropics/claude-code) installed and configured
-- Git installed
-- Your project's build tools (npm, bun, etc.)
+- [Claude Code CLI](https://github.com/anthropics/claude-code)
+- Git
+- Your project's build tools
+
+Optional MCP servers:
+- **DeepWiki** - For researching GitHub repositories
+- **Perplexity** - For package version lookups
 
 ## Tips
 
-1. **Start with planning**: Always run `./loop.sh plan` first to generate the implementation plan
-2. **Keep AGENTS.md updated**: Add operational learnings as you discover them
-3. **Small tasks**: Break down tasks into 1-2 hour chunks for better iteration
-4. **Detailed specs**: The more detailed your specs, the better Claude can implement
-5. **Monitor progress**: Check IMPLEMENTATION_PLAN.md between iterations
-
-## Troubleshooting
-
-### Claude CLI not found
-Install Claude Code: https://github.com/anthropics/claude-code
-
-### Prompt file not found
-Ensure PROMPT_build.md or PROMPT_plan.md exists in your project root
-
-### Git errors
-Initialize git: `git init && git add . && git commit -m "Initial commit"`
+1. **Start with planning** - Run `./loop.sh plan` first
+2. **Detailed specs** - Better specs = better implementation
+3. **Small tasks** - Break into focused chunks
+4. **Monitor HUMAN_TASKS.md** - Check for blocked items
+5. **Update AGENTS.md** - Add learnings as you discover them
 
 ## Credits
 
-Based on the [Ralph Playbook](https://github.com/ClaytonFarr/ralph-playbook) by Clayton Farr.
+Based on [Ralph Playbook](https://github.com/ClaytonFarr/ralph-playbook) by Clayton Farr.
