@@ -30,3 +30,21 @@ mcp__deepwiki__read_wiki_contents("owner/repo")
 - `"tailwindcss/tailwindcss"` → "How do I configure custom colors?"
 
 Always consult DeepWiki before implementing unfamiliar integrations to ensure you follow current best practices.
+
+## Installing packages
+
+When installing any new package, gem, or dependency:
+
+1. **Always install the latest version** - avoid pinning to old versions unless necessary
+2. **Search Perplexity first** - use the Perplexity MCP to find:
+   - Current latest stable version
+   - Any breaking changes or migration notes
+   - Known issues with recent versions
+3. **Verify compatibility** - check if latest version works with your project's stack
+
+```
+# Example: Before installing a package
+mcp__perplexity__search("latest version of [package-name] [year] breaking changes")
+```
+
+This prevents installing outdated versions and catches potential compatibility issues early.
