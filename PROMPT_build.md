@@ -43,24 +43,32 @@ Before completing any task, ask:
 Study these files to understand the project:
 
 1. **@IMPLEMENTATION_PLAN.md** - Current tasks and priorities (START HERE)
-2. **@PRD.md** - Product requirements for context
-3. **@specs/\*** - Detailed specifications
-4. **@AGENTS.md** - Build/test commands
-5. **@src/\*** and **@apps/\*** - Current source code
+2. **@HUMAN_TASKS.md** - Pending human actions (check if any were completed)
+3. **@PRD.md** - Product requirements for context
+4. **@specs/\*** - Detailed specifications
+5. **@AGENTS.md** - Build/test commands
+6. **@src/\*** and **@apps/\*** - Current source code
 
 ## Phase 1: Select Task
 
 From `@IMPLEMENTATION_PLAN.md`, select the **most important unblocked task**:
 
-1. Find tasks with status "pending" or "in_progress"
-2. Check that dependencies are satisfied (dependent tasks completed)
-3. Choose the highest priority unblocked task
-4. Mark it as "in_progress" in the plan
+1. **Check for unblocked human tasks**: Look for tasks that were `blocked-human` but now have "Human notes" filled in - these may be ready to retry
+2. Find tasks with status "pending" or "in_progress"
+3. Check that dependencies are satisfied (dependent tasks completed)
+4. Choose the highest priority unblocked task
+5. Mark it as "in_progress" in the plan
 
-If no tasks are available (all blocked or completed):
+**Skip tasks with status:**
+- `blocked` - waiting for other tasks
+- `blocked-human` - waiting for human action (check HUMAN_TASKS.md)
+- `completed` - already done
 
-- Update IMPLEMENTATION_PLAN.md to note this
-- Commit and exit
+If no tasks are available:
+
+- **All completed**: Update plan, commit, exit with success message
+- **All blocked-human**: Commit current state, exit with: "Waiting for human input. See HUMAN_TASKS.md"
+- **Mix of blocked**: Document in plan, continue with any `pending` tasks
 
 ## Phase 2: Implement
 
@@ -291,6 +299,58 @@ If you encounter errors:
 3. **Type errors**: Fix the types, do not use `any`
 4. **Lint errors**: Fix the lint issue, do not disable rule
 5. **Blocked task**: Mark as blocked, select different task
+6. **Needs human input**: See "Escalating to Human" below
+
+### Escalating to Human
+
+When you're stuck on something that requires human action (not just a different approach), escalate properly:
+
+**When to escalate:**
+- Missing environment variables or secrets
+- Need external service credentials (API keys, database URLs)
+- Need deployment URLs or infrastructure setup
+- Permissions or access issues
+- Ambiguous requirements that need clarification
+- External dependencies the human must set up
+
+**When NOT to escalate:**
+- You haven't tried alternative approaches yet
+- The task is just difficult (try harder first)
+- You want confirmation (make a decision and proceed)
+- Nice-to-know information (work with what you have)
+
+**How to escalate:**
+
+1. **Update IMPLEMENTATION_PLAN.md**:
+   - Change task status to `blocked-human`
+   - Add clear note about what's needed
+
+2. **Append to HUMAN_TASKS.md**:
+   ```markdown
+   ### [Brief title of what's needed]
+   **Blocking**: TASK-XXX (task name)
+   **Needed by**: [Why AI cannot proceed without this]
+
+   **What's needed**:
+   - [Specific action item 1]
+   - [Specific action item 2]
+
+   **How to verify**: [How human knows it's done correctly]
+   ```
+
+3. **Continue with other tasks**: Select next unblocked task and keep working
+
+4. **If ALL tasks are blocked-human**:
+   - Commit current state
+   - Push changes
+   - Exit cleanly with message: "All remaining tasks require human input. See HUMAN_TASKS.md"
+
+**Human's workflow** (for your awareness):
+1. Human checks HUMAN_TASKS.md
+2. Completes the required action
+3. Removes entry from HUMAN_TASKS.md
+4. Updates IMPLEMENTATION_PLAN.md: status → `pending`, adds note in "Human notes"
+5. Restarts the loop
 
 ## Output
 

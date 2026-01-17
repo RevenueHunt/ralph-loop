@@ -12,6 +12,7 @@
 ### [P0] TASK-001: [Task Name]
 
 - **Status**: pending
+  <!-- Status values: pending | in_progress | completed | blocked | blocked-human -->
 - **Depends on**: none
 - **Acceptance criteria**:
   - [ ] [Criterion 1]
@@ -19,6 +20,7 @@
 - **Tests required**:
   - [ ] [Test 1]
 - **Notes**: [Any relevant context]
+- **Human notes**: <!-- Human adds notes here after unblocking -->
 
 ### [P0] TASK-002: [Task Name]
 
@@ -55,7 +57,18 @@
 
 ## Blocked Tasks
 
-<!-- Document blocked tasks with reasons -->
+<!--
+Two types of blocked:
+- blocked: Waiting for another task to complete (AI can resolve)
+- blocked-human: Requires human action (see HUMAN_TASKS.md for details)
+
+Human workflow for blocked-human tasks:
+1. Check HUMAN_TASKS.md for what's needed
+2. Complete the action
+3. Remove entry from HUMAN_TASKS.md
+4. Change status here from "blocked-human" to "pending"
+5. Add note in "Human notes" field
+-->
 
 ---
 
