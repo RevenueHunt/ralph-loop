@@ -3,6 +3,23 @@
 This file contains operational learnings for building and running the project.
 Keep this file concise (~60 lines max). Status updates go in IMPLEMENTATION_PLAN.md.
 
+## Development Philosophy
+
+<!-- These are non-negotiable. Every PR should pass these checks. -->
+
+| Principle | Question to Ask |
+|-----------|-----------------|
+| **Simple** | Is this the simplest solution that works? |
+| **DRY** | Did I search for existing code first? |
+| **No by default** | Does this feature earn its complexity? |
+| **Interface-first** | Does this serve the user's actual need? |
+| **Pattern match** | Does this follow existing conventions? |
+
+**Before completing any task:**
+1. Search codebase for similar patterns/utilities
+2. Remove anything that isn't strictly necessary
+3. Verify a junior dev could understand it in 5 minutes
+
 ## Build & Run
 
 <!-- CUSTOMIZE: Add your project's build commands -->
