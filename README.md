@@ -39,6 +39,7 @@ Claude autonomously implements features through a continuous bash loop with file
 ```bash
 # Copy core files
 cp ralph_playbook/loop.sh your-project/
+cp ralph_playbook/requirements.sh your-project/
 cp ralph_playbook/PROMPT_*.md your-project/
 
 # Copy templates
@@ -60,6 +61,9 @@ cp -r ralph_playbook/.claude your-project/
 ### 3. Run
 
 ```bash
+# Requirements mode - interactive session to define PRD and specs
+./requirements.sh
+
 # Planning mode - creates IMPLEMENTATION_PLAN.md
 ./loop.sh plan
 
@@ -90,6 +94,8 @@ Skills are stored in `.claude/commands/` and loaded on-demand to reduce token us
 | File | Purpose |
 |------|---------|
 | `loop.sh` | Orchestrates RALPH iterations |
+| `requirements.sh` | Interactive requirements gathering session |
+| `PROMPT_requirements.md` | Requirements mode instructions |
 | `PROMPT_plan.md` | Planning mode instructions |
 | `PROMPT_build.md` | Build mode instructions (references skills) |
 | `AGENTS.md` | Operational knowledge: commands, patterns, learnings |
@@ -100,6 +106,11 @@ Skills are stored in `.claude/commands/` and loaded on-demand to reduce token us
 | `.claude/commands/*.md` | Claude Code skills |
 
 ## Modes
+
+**Requirements Mode** (`./requirements.sh`):
+- Interactive session with Claude
+- Interviews you about project goals, users, features
+- Generates PRD.md and initial specs
 
 **Plan Mode** (`./loop.sh plan`):
 - Analyzes specs vs current code
@@ -138,11 +149,12 @@ Optional MCP servers:
 
 ## Tips
 
-1. **Start with planning** - Run `./loop.sh plan` first
-2. **Detailed specs** - Better specs = better implementation
-3. **Small tasks** - Break into focused chunks
-4. **Monitor HUMAN_TASKS.md** - Check for blocked items
-5. **Update AGENTS.md** - Add learnings as you discover them
+1. **Start with requirements** - Run `./requirements.sh` to define PRD and specs
+2. **Then plan** - Run `./loop.sh plan` to create the implementation plan
+3. **Detailed specs** - Better specs = better implementation
+4. **Small tasks** - Break into focused chunks
+5. **Monitor HUMAN_TASKS.md** - Check for blocked items
+6. **Update AGENTS.md** - Add learnings as you discover them
 
 ## Credits
 
