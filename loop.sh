@@ -36,21 +36,25 @@ usage() {
     echo "Modes:"
     echo "  build           Run in BUILD mode (default) - implements tasks"
     echo "  plan            Run in PLAN mode - creates implementation plan from specs"
+    echo "  archive         Run in ARCHIVE mode - moves specs and plan to .archive/"
     echo ""
     echo "Examples:"
     echo "  $0              # Build mode, 20 iterations"
     echo "  $0 10           # Build mode, 10 iterations"
     echo "  $0 plan         # Plan mode, 2 iterations (typical)"
     echo "  $0 plan 5       # Plan mode, max 5 iterations"
+    echo "  $0 archive      # Archive mode - moves completed work to .archive/"
     echo ""
     echo "Workflow (Ralph Playbook):"
     echo "  1. ./requirements.sh    # Phase 1: Interactive - define specs"
     echo "  2. ./loop.sh plan       # Phase 2: Headless - create implementation plan"
     echo "  3. ./loop.sh            # Phase 3: Headless - build iteratively"
+    echo "  4. ./loop.sh archive    # Phase 4: Interactive - archive completed work"
     echo ""
     echo "Files used:"
     echo "  PROMPT_plan.md       - Instructions for planning (gap analysis)"
     echo "  PROMPT_build.md      - Instructions for building"
+    echo "  PROMPT_archive.md    - Instructions for archiving"
     echo "  IMPLEMENTATION_PLAN.md - Task tracking"
     echo "  AGENTS.md            - Operational knowledge"
     echo "  specs/*              - Requirements (created by requirements.sh)"
@@ -70,6 +74,10 @@ parse_args() {
         if [[ -n "$2" ]] && [[ "$2" =~ ^[0-9]+$ ]]; then
             MAX_ITERATIONS=$2
         fi
+    elif [[ "$1" == "archive" ]]; then
+        MODE="archive"
+        PROMPT_FILE="PROMPT_archive.md"
+        MAX_ITERATIONS=1  # Archive mode is a single interactive session
     elif [[ "$1" =~ ^[0-9]+$ ]]; then
         MAX_ITERATIONS=$1
     elif [[ -n "$1" ]]; then
@@ -130,16 +138,24 @@ run_iteration() {
     local start_timestamp=$(date '+%Y-%m-%d %H:%M:%S')
     echo -e "${YELLOW}Started at: $start_timestamp${NC}"
 
-    # Run Claude with the prompt
     echo -e "${BLUE}Running Claude with $PROMPT_FILE...${NC}"
     echo ""
 
-    # Pipe the prompt file to Claude CLI (headless mode for both plan and build)
-    # -p: headless/print mode (reads stdin, exits when done)
+    # -p: headless/print mode (reads stdin, exits when done) - used for plan and build
     # --dangerously-skip-permissions: autonomous operation
     # --model opus: best reasoning for complex tasks
     # --verbose: detailed logging
-    if cat "$PROMPT_FILE" | claude -p --dangerously-skip-permissions --model opus --verbose; then
+    # Archive mode runs interactively (no -p) for user input
+    if [[ "$MODE" == "archive" ]]; then
+        if cat "$PROMPT_FILE" | claude --dangerously-skip-permissions --model opus --verbose; then
+            echo ""
+            echo -e "${GREEN}Claude archive completed successfully${NC}"
+        else
+            echo ""
+            echo -e "${RED}Claude archive failed${NC}"
+            return 1
+        fi
+    elif cat "$PROMPT_FILE" | claude -p --dangerously-skip-permissions --model opus --verbose; then
         echo ""
         echo -e "${GREEN}Claude iteration completed successfully${NC}"
     else

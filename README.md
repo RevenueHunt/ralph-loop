@@ -7,19 +7,19 @@ Claude autonomously implements features through a continuous bash loop with file
 ## How It Works
 
 ```
-┌────────────────────────────────────────────────────────────────────────┐
-│                             RALPH LOOP                                 │
-├────────────────────────────────────────────────────────────────────────┤
-│                                                                        │
-│  ┌────────┐   ┌────────┐   ┌────────┐   ┌────────┐   ┌────────┐        │
-│  │  PLAN  │──►│ BUILD  │──►│ VERIFY │──►│ HUMAN  │──►│  GIT   │        │
-│  │        │   │        │   │        │   │ TASKS  │   │ COMMIT │        │
-│  └────────┘   └────────┘   └────────┘   │(if any)│   └────────┘        │
-│       ▲                                 └────────┘        │            │
-│       │                                                   │            │
-│       └───────────────────────────────────────────────────┘            │
-│                                                                        │
-└────────────────────────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────────────────────────┐
+│                                RALPH LOOP                                      │
+├────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                │
+│  ┌────────┐   ┌────────┐   ┌────────┐   ┌────────┐   ┌────────┐   ┌─────────┐  │
+│  │  PLAN  │──►│ BUILD  │──►│ VERIFY │──►│ HUMAN  │──►│  GIT   │──►│ ARCHIVE │  │
+│  │        │   │        │   │        │   │ TASKS  │   │ COMMIT │   │  (opt)  │  │
+│  └────────┘   └────────┘   └────────┘   │(if any)│   └────────┘   └─────────┘  │
+│       ▲                                 └────────┘        │                    │
+│       │                                                   │                    │
+│       └───────────────────────────────────────────────────┘                    │
+│                                                                                │
+└────────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ## Features
@@ -72,6 +72,9 @@ cp -r ralph_playbook/.claude your-project/
 
 # Build with iteration limit
 ./loop.sh build 10
+
+# Archive mode - moves specs/ and IMPLEMENTATION_PLAN.md to .archive/
+./loop.sh archive
 ```
 
 ## Skills (Slash Commands)
@@ -98,6 +101,7 @@ Skills are stored in `.claude/commands/` and loaded on-demand to reduce token us
 | `PROMPT_requirements.md` | Requirements mode instructions |
 | `PROMPT_plan.md` | Planning mode instructions |
 | `PROMPT_build.md` | Build mode instructions (references skills) |
+| `PROMPT_archive.md` | Archive mode instructions |
 | `AGENTS.md` | Operational knowledge: commands, patterns, learnings |
 | `IMPLEMENTATION_PLAN.md` | Task tracking with status and dependencies |
 | `HUMAN_TASKS.md` | Tasks requiring human action |
@@ -122,6 +126,11 @@ Skills are stored in `.claude/commands/` and loaded on-demand to reduce token us
 - Implements with verification
 - Commits and pushes on success
 - Escalates to HUMAN_TASKS.md when blocked
+
+**Archive Mode** (`./loop.sh archive`):
+- Moves `specs/` and `IMPLEMENTATION_PLAN.md` to `.archive/XX_feature_name/`
+- Asks for a descriptive name for the archive
+- Prepares project root for the next development iteration
 
 ## Human Escalation
 
